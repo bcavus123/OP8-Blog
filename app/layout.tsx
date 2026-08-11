@@ -1,0 +1,3 @@
+import type { Metadata } from "next";import "./globals.css";
+export const metadata:Metadata={title:{default:"İzlek — Düşünce, teknoloji ve günlük hayat",template:"%s | İzlek"},description:"İş, teknoloji ve gündelik hayatın kesişiminden berrak fikirler.",icons:{icon:"/favicon.svg"},openGraph:{title:"İzlek",description:"Daha iyi düşünmek için biraz yavaşla.",type:"website",locale:"tr_TR",images:[{url:"/og.png",width:1733,height:909,alt:"İzlek — Daha iyi düşünmek için biraz yavaşla."}]},twitter:{card:"summary_large_image",title:"İzlek",description:"Daha iyi düşünmek için biraz yavaşla.",images:["/og.png"]}};
+export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="tr"><body>{children}</body></html>}
