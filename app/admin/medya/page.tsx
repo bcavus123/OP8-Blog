@@ -1,0 +1,1 @@
+import{requireChatGPTUser}from"../../chatgpt-auth";import{AdminNav}from"../AdminNav";import AdminModule from"../AdminModule";export const dynamic="force-dynamic";export default async function Media(){await requireChatGPTUser("/admin/medya");return <main><AdminNav active="/admin/medya"/><AdminModule mode="media"/></main>}

@@ -1,0 +1,1 @@
+import{requireChatGPTUser}from"../../chatgpt-auth";import{AdminNav}from"../AdminNav";import AdminModule from"../AdminModule";export const dynamic="force-dynamic";export default async function Seo(){await requireChatGPTUser("/admin/seo");return <main><AdminNav active="/admin/seo"/><AdminModule mode="seo"/></main>}

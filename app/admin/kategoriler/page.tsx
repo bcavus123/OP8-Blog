@@ -1,0 +1,1 @@
+import{requireChatGPTUser}from"../../chatgpt-auth";import{AdminNav}from"../AdminNav";import CategoryManager from"./CategoryManager";export const dynamic="force-dynamic";export default async function CategoriesAdmin(){await requireChatGPTUser("/admin/kategoriler");return <main><AdminNav active="/admin/kategoriler"/><CategoryManager/></main>}

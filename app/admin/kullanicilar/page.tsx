@@ -1,0 +1,1 @@
+import{requireChatGPTUser}from"../../chatgpt-auth";import{AdminNav}from"../AdminNav";import AdminModule from"../AdminModule";export const dynamic="force-dynamic";export default async function Users(){await requireChatGPTUser("/admin/kullanicilar");return <main><AdminNav active="/admin/kullanicilar"/><AdminModule mode="users"/></main>}

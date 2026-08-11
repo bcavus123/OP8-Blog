@@ -1,0 +1,1 @@
+import{requireChatGPTUser}from"../../chatgpt-auth";import{AdminNav}from"../AdminNav";import PostManager from"./PostManager";export const dynamic="force-dynamic";export default async function PostsAdmin(){await requireChatGPTUser("/admin/yazilar");return <main><AdminNav active="/admin/yazilar"/><PostManager/></main>}
