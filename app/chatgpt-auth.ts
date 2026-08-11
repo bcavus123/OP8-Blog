@@ -28,6 +28,14 @@ export async function getChatGPTUser(): Promise<ChatGPTUser | null> {
     };
   }
   const requestHeaders = await headers();
+  const authorization=requestHeaders.get("authorization");
+  if(authorization?.startsWith("Basic ")){
+    try{
+      const decoded=Buffer.from(authorization.slice(6),"base64").toString("utf8");
+      const split=decoded.indexOf(":");const email=decoded.slice(0,split);const password=decoded.slice(split+1);
+      if(split>0&&email===process.env.ADMIN_EMAIL&&password===process.env.ADMIN_PASSWORD)return{userId:`hostinger:${email}`,displayName:"Hostinger Yöneticisi",email,fullName:"Hostinger Yöneticisi"};
+    }catch{}
+  }
   const userId = requestHeaders.get(USER_ID_HEADER);
   const email = requestHeaders.get(USER_EMAIL_HEADER);
   if (!userId || !email) return null;
