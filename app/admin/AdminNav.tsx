@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Actor, can, Permission } from "../admin-auth";
 
 const links = [
@@ -18,12 +17,12 @@ export function AdminNav({ active, actor }: { active: string; actor: Actor }) {
   return <>
     <style>{"body>.global-user-menu{display:none}"}</style>
     <header className="admin-header">
-      <Link className="brand" href="/"><span>OP8</span> OP8 Operating Partner Value Creation Framework</Link>
+      <a className="brand" href="/"><span>OP8</span> OP8 Operating Partner Value Creation Framework</a>
       <nav aria-label="Yönetim menüsü">
         {links.filter(([, , permission]) => can(actor, permission as Permission)).map(([href, label]) =>
-          <Link aria-current={active === href ? "page" : undefined} className={active === href ? "active" : undefined} href={href} key={href}>{label}</Link>
+          <a aria-current={active === href ? "page" : undefined} className={active === href ? "active" : undefined} href={href} key={href}>{label}</a>
         )}
-        <Link href="/">Site</Link>
+        <a href="/">Site</a>
       </nav>
     </header>
   </>;
