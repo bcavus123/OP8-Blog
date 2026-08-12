@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 2.9 seconds
-Output:
 import { and, asc, desc, eq, isNotNull, lte } from "drizzle-orm";
 import { getDb } from "../../../db";
 import { categories, posts } from "../../../db/schema";
@@ -37,4 +34,3 @@ export async function GET() {
     return Response.json({ posts: [], topics: [] });
   }
 }
-

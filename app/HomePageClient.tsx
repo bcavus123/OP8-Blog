@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 2.1 seconds
-Output:
 "use client";
 
 import Link from "next/link";
@@ -36,4 +33,3 @@ export default function HomePageClient({initialConfig,initialPosts,initialTopics
     <footer id="hakkinda"><div className="shell footer-inner"><div><Brand config={config} footer/><p>OP8 değer yaratma yaklaşımına ilişkin analizler ve uygulama notları.</p></div><div>{config.headerMenu.filter(x=>x.visible).map(x=><a href={x.href} key={x.id}>{x.label}</a>)}</div><p>© 2026 OP8 Operating Partner Value Creation Framework</p></div></footer>
   </main>
 }
-

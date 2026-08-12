@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 2.6 seconds
-Output:
 import { defineConfig, globalIgnores } from "eslint/config";
 import eslint from "@eslint/js";
 import next from "@next/eslint-plugin-next";
@@ -47,4 +44,3 @@ const eslintConfig = defineConfig([
 ]);
 
 export default eslintConfig;
-

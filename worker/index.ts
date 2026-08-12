@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 2.3 seconds
-Output:
 /** Cloudflare Worker entry point for the vinext-starter template. */
 import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
@@ -49,4 +46,3 @@ const worker = {
 };
 
 export default worker;
-

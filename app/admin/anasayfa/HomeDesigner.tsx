@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 1.9 seconds
-Output:
 "use client";
 import {useEffect,useState} from "react";
 import {defaultHomeConfig,HeroTextStyle,HomeConfig,HomeSection,normalizeHomeConfig} from "../../homepage-config";
@@ -32,4 +29,3 @@ export default function HomeDesigner(){
  <aside className="home-preview"><p className="kicker">CANLI ÖN İZLEME</p><div className="preview-hero">{config.hero.imageUrl&&<img src={config.hero.imageUrl} alt=""/>}<small style={config.hero.eyebrowStyle}>{config.hero.eyebrow}</small><h2><span style={config.hero.titleStyle}>{config.hero.title}</span><em style={config.hero.accentStyle}>{config.hero.accent}</em></h2><p style={config.hero.descriptionStyle}>{config.hero.description}</p><span>{config.hero.buttonLabel} →</span></div>{config.sections.filter(x=>x.visible).map(section=><div className="preview-section" key={section.id}>{section.imageUrl&&<img src={section.imageUrl} alt=""/>}<small>{section.eyebrow}</small><strong>{section.title}</strong></div>)}</aside>
  </div></div>
 }
-

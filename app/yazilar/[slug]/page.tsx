@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 2.4 seconds
-Output:
 import Link from "next/link";
 import { and, eq, isNotNull, lte } from "drizzle-orm";
 import { getDb } from "../../../db";
@@ -17,4 +14,3 @@ export default async function ArticlePage({params}:{params:Promise<{slug:string}
   const paragraphs=post.content.split(/\n{2,}/).map(value=>value.trim()).filter(Boolean);
   return <main><header className="site-header shell"><Link className="brand" href="/"><span>OP8</span> OP8 Operating Partner Value Creation Framework</Link><nav><Link href="/#yazilar">Yazılar</Link><Link href="/#konular">Konular</Link><Link href="/#hakkinda">Hakkında</Link></nav></header><article className="article shell"><Link className="back" href="/">← Tüm yazılar</Link><p className="kicker">{post.categoryName||"GENEL"}</p><h1>{post.title}</h1><p className="article-deck">{post.excerpt}</p>{post.publishedAt&&<div className="meta"><span>{new Intl.DateTimeFormat("tr-TR",{day:"numeric",month:"long",year:"numeric"}).format(new Date(post.publishedAt.replace(" ","T")+"Z"))}</span></div>}{post.coverUrl&&<img className="article-cover" src={post.coverUrl} alt={post.coverAlt}/>}<div className="article-rule"/><div className="article-body"><div>{paragraphs.map((paragraph,index)=><p className={index===0?"lead":undefined} key={index}>{paragraph}</p>)}</div></div></article></main>
 }
-

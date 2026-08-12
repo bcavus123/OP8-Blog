@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 2.9 seconds
-Output:
 import { existsSync, readFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 
@@ -17,4 +14,3 @@ if (bad.length) {
   process.exit(1);
 }
 console.log("Türkçe UTF-8 kontrolü başarılı.");
-

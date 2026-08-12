@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 2.6 seconds
-Output:
 import { and, asc, desc, eq, isNotNull, lte } from "drizzle-orm";
 import { getDb } from "../db";
 import { categories, homepageSettings, posts } from "../db/schema";
@@ -30,4 +27,3 @@ async function loadPosts(){
   const now=new Date().toISOString().slice(0,19).replace("T"," ");
   return getDb().select({id:posts.id,title:posts.title,slug:posts.slug,excerpt:posts.excerpt,categoryId:posts.categoryId,categoryName:categories.name,coverUrl:posts.coverUrl,coverAlt:posts.coverAlt,publishedAt:posts.publishedAt}).from(posts).leftJoin(categories,eq(posts.categoryId,categories.id)).where(and(eq(posts.status,"published"),isNotNull(posts.publishedAt),lte(posts.publishedAt,now))).orderBy(desc(posts.publishedAt),desc(posts.id));
 }
-

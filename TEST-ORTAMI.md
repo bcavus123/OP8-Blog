@@ -1,7 +1,4 @@
-Exit code: 0
-Wall time: 1.9 seconds
-Output:
-# OP8 Operating Partner Value Creation Framework test ortamı
+﻿# OP8 Operating Partner Value Creation Framework test ortamı
 
 Yerel test ortamı, `Test Yöneticisi` hesabıyla otomatik oturum açar. Bu davranış yalnızca `LOCAL_TEST_MODE=1` iken etkindir; canlı yayında kapalıdır.
 
@@ -17,4 +14,3 @@ Kontrol listesi:
 - Yukarı/aşağı düğmeleriyle sıralamayı değiştir.
 - Bir yazıyı başka kategoriye bağla.
 - Kategoriyi sil; bağlı yazının "Kategorisiz" kaldığını doğrula.
-

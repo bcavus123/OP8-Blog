@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 2.3 seconds
-Output:
 import{bigint,customType,index,int,longtext,mysqlTable,primaryKey,text,timestamp,uniqueIndex,varchar}from"drizzle-orm/mysql-core";
 const longblob=customType<{data:Buffer;driverData:Buffer}>({dataType:()=>"longblob"});
 const created=()=>timestamp("created_at",{mode:"string"}).notNull().defaultNow();
@@ -16,4 +13,3 @@ export const analyticsDaily=mysqlTable("analytics_daily",{id:int("id").autoincre
 export const homepageSettings=mysqlTable("homepage_settings",{id:int("id").primaryKey(),config:longtext("config").notNull(),updatedAt:updated()});
 export const users=mysqlTable("users",{id:int("id").autoincrement().primaryKey(),email:varchar("email",{length:190}).notNull(),displayName:varchar("display_name",{length:190}).notNull(),passwordHash:varchar("password_hash",{length:255}).notNull(),role:varchar("role",{length:32}).notNull().default("member"),status:varchar("status",{length:24}).notNull().default("active"),createdAt:created(),updatedAt:updated()},t=>[uniqueIndex("idx_users_email").on(t.email),index("idx_users_role").on(t.role)]);
 export const userSessions=mysqlTable("user_sessions",{id:int("id").autoincrement().primaryKey(),userId:int("user_id").notNull().references(()=>users.id,{onDelete:"cascade"}),tokenHash:varchar("token_hash",{length:64}).notNull(),expiresAt:timestamp("expires_at",{mode:"string"}).notNull(),createdAt:created()},t=>[uniqueIndex("idx_user_sessions_token_hash").on(t.tokenHash),index("idx_user_sessions_user_id").on(t.userId)]);
-

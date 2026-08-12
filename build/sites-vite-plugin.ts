@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 2.4 seconds
-Output:
 import { access, cp, mkdir, rm } from "node:fs/promises";
 import { resolve } from "node:path";
 import type { Plugin } from "vite";
@@ -46,4 +43,3 @@ export function sites(): Plugin {
     },
   };
 }
-
