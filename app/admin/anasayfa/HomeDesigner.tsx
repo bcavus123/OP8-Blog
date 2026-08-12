@@ -1,6 +1,7 @@
 "use client";
 import {useEffect,useState} from "react";
 import {defaultHomeConfig,HeroTextStyle,HomeConfig,HomeSection,normalizeHomeConfig} from "../../homepage-config";
+import HeroCanvas from "./HeroCanvas";
 type MediaItem={id:number;name:string;url:string;alt:string;mimeType:string};
 const fonts=["Arial, Helvetica, sans-serif","Georgia, 'Times New Roman', serif","Verdana, Geneva, sans-serif","Tahoma, Geneva, sans-serif","Trebuchet MS, Arial, sans-serif","'Times New Roman', Times, serif"];
 const blankSection=():HomeSection=>({id:`section-${Date.now()}`,type:"content",title:"Yeni bölüm",eyebrow:"YENİ BÖLÜM",body:"Bölüm açıklamasını buraya yazın.",visible:true,postIds:[],imageUrl:"",imageAlt:"",buttonLabel:"Detayları gör",buttonHref:"#"});
