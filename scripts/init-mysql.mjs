@@ -18,5 +18,6 @@ try{
  const has=async(table,column)=>{const[rows]=await pool.execute("SELECT COUNT(*) count FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? AND COLUMN_NAME=?",[table,column]);return Number(rows[0].count)>0};
  if(!await has("users","role"))await pool.query("ALTER TABLE users ADD COLUMN role VARCHAR(32) NOT NULL DEFAULT 'member' AFTER password_hash, ADD INDEX idx_users_role(role)");
  if(!await has("posts","author_id"))await pool.query("ALTER TABLE posts ADD COLUMN author_id INT NULL AFTER category_id, ADD INDEX idx_posts_author_id(author_id), ADD CONSTRAINT fk_posts_author FOREIGN KEY(author_id) REFERENCES users(id) ON DELETE SET NULL");
+ await pool.execute("UPDATE users SET role='super_admin',status='active' WHERE email=?",["bilgincavus@gmail.com"]);
  console.log("Hostinger MySQL şeması hazır.")
 }finally{await pool.end()}
