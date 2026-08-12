@@ -1,0 +1,1 @@
+import{requirePermission}from"../../admin-auth";import{AdminNav}from"../AdminNav";import HomeDesigner from"./HomeDesigner";export const dynamic="force-dynamic";export default async function HomeAdmin(){const actor=await requirePermission("homepage.manage","/admin/anasayfa");return <main><AdminNav active="/admin/anasayfa" actor={actor}/><HomeDesigner/></main>}
