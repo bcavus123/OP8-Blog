@@ -1,3 +1,3 @@
-import{NextRequest,NextResponse}from"next/server";
-export function middleware(request:NextRequest){if(process.env.LOCAL_TEST_MODE==="1")return NextResponse.next();const auth=request.headers.get("authorization");if(auth?.startsWith("Basic ")){try{const decoded=atob(auth.slice(6));const split=decoded.indexOf(":");if(split>0&&decoded.slice(0,split)===process.env.ADMIN_EMAIL&&decoded.slice(split+1)===process.env.ADMIN_PASSWORD)return NextResponse.next()}catch{}}return new NextResponse("Yönetim paneli için giriş yapın.",{status:401,headers:{"WWW-Authenticate":'Basic realm="OP8 Yönetim Paneli", charset="UTF-8"'}})}
+import{NextResponse}from"next/server";
+export function middleware(){return NextResponse.next()}
 export const config={matcher:["/admin/:path*","/api/admin/:path*"]};

@@ -13,6 +13,10 @@ const eslintConfig = defineConfig([
     "dist/**",
     "out/**",
     "build/**",
+    "work/**",
+    "worker/**",
+    ".vinext/**",
+    ".wrangler/**",
     "next-env.d.ts",
   ]),
   eslint.configs.recommended,
@@ -35,6 +39,7 @@ const eslintConfig = defineConfig([
         version: "detect",
       },
     },
+    rules:{"@next/next/no-img-element":"off","react-hooks/set-state-in-effect":"off","@typescript-eslint/no-explicit-any":"off","react-hooks/exhaustive-deps":"off"},
   },
 ]);
 

@@ -14,7 +14,9 @@
     "db:generate": "drizzle-kit generate",
     "db:init": "node scripts/init-mysql.mjs",
     "hostinger:build": "npm run db:init && npm run build",
-    "test:env": "node scripts/test-env.mjs"
+    "test:env": "node scripts/test-env.mjs",
+    "test:permissions": "node --test tests/permissions.test.mjs",
+    "test:rbac:mysql": "node scripts/test-rbac-mysql.mjs"
   },
   "dependencies": {
     "drizzle-orm": "0.45.2",

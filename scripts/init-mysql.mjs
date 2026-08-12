@@ -13,4 +13,10 @@ CREATE TABLE IF NOT EXISTS analytics_daily (id INT AUTO_INCREMENT PRIMARY KEY,da
 CREATE TABLE IF NOT EXISTS homepage_settings (id INT PRIMARY KEY,config LONGTEXT NOT NULL,updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP);
 CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT PRIMARY KEY,email VARCHAR(190) NOT NULL UNIQUE,display_name VARCHAR(190) NOT NULL,password_hash VARCHAR(255) NOT NULL,status VARCHAR(24) NOT NULL DEFAULT 'active',created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP);
 CREATE TABLE IF NOT EXISTS user_sessions (id INT AUTO_INCREMENT PRIMARY KEY,user_id INT NOT NULL,token_hash VARCHAR(64) NOT NULL UNIQUE,expires_at TIMESTAMP NOT NULL,created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,INDEX idx_user_sessions_user_id(user_id),CONSTRAINT fk_user_sessions_user FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);`;
-try{await pool.query(sql);console.log("Hostinger MySQL şeması hazır.")}finally{await pool.end()}
+try{
+ await pool.query(sql);
+ const has=async(table,column)=>{const[rows]=await pool.execute("SELECT COUNT(*) count FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? AND COLUMN_NAME=?",[table,column]);return Number(rows[0].count)>0};
+ if(!await has("users","role"))await pool.query("ALTER TABLE users ADD COLUMN role VARCHAR(32) NOT NULL DEFAULT 'member' AFTER password_hash, ADD INDEX idx_users_role(role)");
+ if(!await has("posts","author_id"))await pool.query("ALTER TABLE posts ADD COLUMN author_id INT NULL AFTER category_id, ADD INDEX idx_posts_author_id(author_id), ADD CONSTRAINT fk_posts_author FOREIGN KEY(author_id) REFERENCES users(id) ON DELETE SET NULL");
+ console.log("Hostinger MySQL şeması hazır.")
+}finally{await pool.end()}
