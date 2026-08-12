@@ -18,6 +18,7 @@ function ContentSection({section}:{section:HomeSection}){return <section classNa
 function Brand({config,footer=false}:{config:HomeConfig;footer?:boolean}){return <Link className={`brand ${footer?"footer-brand":""}`} href="/">{config.brand.logoUrl?<img className="site-logo" src={config.brand.logoUrl} alt={config.brand.logoAlt} style={{width:config.brand.logoWidth}}/>:<><span>OP8</span>{config.brand.siteName}</>}</Link>}
 function themeStyle(config:HomeConfig){return{"--ink":config.theme.ink,"--paper":config.theme.paper,"--cream":config.theme.cream,"--orange":config.theme.accent,"--line":config.theme.line,"--muted":config.theme.muted,"--font-serif":config.theme.headingFont,"--font-sans":config.theme.bodyFont,background:config.theme.paper,color:config.theme.ink,minHeight:"100vh"} as React.CSSProperties}
 
+function boxStyle(box:{x:number;y:number;width:number;height:number}){return{position:"absolute",left:`${box.x}%`,top:`${box.y}%`,width:`${box.width}%`,height:`${box.height}%`,margin:0,overflow:"visible"} as React.CSSProperties}
 export default function HomePageClient({initialConfig,initialPosts,initialTopics}:{initialConfig:HomeConfig;initialPosts:PublishedPost[];initialTopics:Topic[]}){
   const config=normalizeHomeConfig(initialConfig||defaultHomeConfig),posts=initialPosts||[],topics=initialTopics||[],loaded=true;
   const sections=useMemo(()=>config.sections.filter(section=>section.visible),[config.sections]);
