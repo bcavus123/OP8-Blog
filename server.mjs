@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 2.4 seconds
+Output:
 import { resolve } from "node:path";
 
 import { startProdServer } from "vinext/server/prod-server";
@@ -9,3 +12,4 @@ await startProdServer({
   outDir: resolve("dist"),
   port,
 });
+

@@ -1,2 +1,6 @@
-﻿import{eq}from"drizzle-orm";import{getDb}from"../../../../db";import{media}from"../../../../db/schema";
+Exit code: 0
+Wall time: 2.7 seconds
+Output:
+import{eq}from"drizzle-orm";import{getDb}from"../../../../db";import{media}from"../../../../db/schema";
 export async function GET(_:Request,{params}:{params:Promise<{key:string}>}){const{key}=await params;const[item]=await getDb().select({content:media.content,mimeType:media.mimeType}).from(media).where(eq(media.key,decodeURIComponent(key))).limit(1);if(!item)return new Response("Bulunamadı",{status:404});return new Response(new Uint8Array(item.content),{headers:{"content-type":item.mimeType,"cache-control":"public, max-age=31536000, immutable"}})}
+

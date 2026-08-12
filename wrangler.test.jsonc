@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 2.4 seconds
+Output:
 {
   "name": "izlek-local-test",
   "compatibility_date": "2026-08-11",
@@ -9,3 +12,4 @@
     }
   ]
 }
+

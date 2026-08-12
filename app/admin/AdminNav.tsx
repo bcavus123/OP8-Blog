@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 1.8 seconds
+Output:
 import { Actor, can, Permission } from "../admin-auth";
 
 const links = [
@@ -27,3 +30,4 @@ export function AdminNav({ active, actor }: { active: string; actor: Actor }) {
     </header>
   </>;
 }
+

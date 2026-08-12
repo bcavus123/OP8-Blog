@@ -1,3 +1,7 @@
+Exit code: 0
+Wall time: 2.7 seconds
+Output:
 import{NextRequest,NextResponse}from"next/server";import{getPool}from"../../../../db";import{bootstrapAdminEmail}from"../../../bootstrap-admin";import{createUserSession,hashPassword}from"../../../user-auth";
 export async function POST(request:NextRequest){const form=await request.formData();const name=String(form.get("name")||"").trim().slice(0,190);const email=String(form.get("email")||"").trim().toLowerCase().slice(0,190);const password=String(form.get("password")||"");const target=safe(String(form.get("return_to")||"/profil"));if(name.length<2||!email.includes("@")||password.length<8)return fail(request,"kayit",target);try{const role=email===bootstrapAdminEmail||email===process.env.ADMIN_EMAIL?.trim().toLowerCase()?"super_admin":"member";const[result]=await getPool().execute<any>("INSERT INTO users(email,display_name,password_hash,role) VALUES(?,?,?,?)",[email,name,hashPassword(password),role]);await createUserSession(result.insertId);return NextResponse.redirect(new URL(target,request.url),303)}catch(error:any){return fail(request,error?.code==="ER_DUP_ENTRY"?"email":"kayit",target)}}
 function fail(r:NextRequest,code:string,target:string){return NextResponse.redirect(new URL(`/giris?error=${code}&return_to=${encodeURIComponent(target)}`,r.url),303)}function safe(v:string){return v.startsWith("/")&&!v.startsWith("//")?v:"/profil"}
+

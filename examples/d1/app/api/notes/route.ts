@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 2.8 seconds
+Output:
 import { desc } from "drizzle-orm";
 import { getDb } from "../../../../../db";
 import { notes } from "../../../db/schema";
@@ -56,3 +59,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

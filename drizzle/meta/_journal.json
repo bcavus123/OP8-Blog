@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 2.8 seconds
+Output:
 {
   "version": "7",
   "dialect": "sqlite",
@@ -25,3 +28,4 @@
     }
   ]
 }
+

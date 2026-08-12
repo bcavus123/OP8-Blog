@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 2.9 seconds
+Output:
 {
   "name": "site-creator-vinext-starter",
   "version": "0.1.0",
@@ -51,3 +54,4 @@
   },
   "type": "module"
 }
+

@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 2.2 seconds
+Output:
 ALTER TABLE `posts` ADD `excerpt` text DEFAULT '' NOT NULL;
 --> statement-breakpoint
 ALTER TABLE `posts` ADD `content` text DEFAULT '' NOT NULL;
@@ -19,3 +22,4 @@ ALTER TABLE `posts` ADD `updated_at` text DEFAULT 'CURRENT_TIMESTAMP' NOT NULL;
 CREATE INDEX `idx_posts_status_published_at` ON `posts` (`status`,`published_at`);
 --> statement-breakpoint
 PRAGMA optimize;
+

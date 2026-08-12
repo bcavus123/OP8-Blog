@@ -1,4 +1,8 @@
-﻿import type { Metadata } from "next";import "./globals.css";import"./home-extra.css";import"./logo.css";import{UserMenu}from"./components/UserMenu";
+Exit code: 0
+Wall time: 2.6 seconds
+Output:
+import type { Metadata } from "next";import "./globals.css";import"./home-extra.css";import"./logo.css";import{UserMenu}from"./components/UserMenu";
 export const dynamic="force-dynamic";
 export const metadata:Metadata={title:{default:"OP8 Operating Partner Value Creation Framework — Düşünce, teknoloji ve günlük hayat",template:"%s | OP8 Operating Partner Value Creation Framework"},description:"İş, teknoloji ve gündelik hayatın kesişiminden berrak fikirler.",icons:{icon:"/favicon.svg"},openGraph:{title:"OP8 Operating Partner Value Creation Framework",description:"Daha iyi düşünmek için biraz yavaşla.",type:"website",locale:"tr_TR",images:[{url:"/og.png",width:1733,height:909,alt:"OP8 Operating Partner Value Creation Framework — Daha iyi düşünmek için biraz yavaşla."}]},twitter:{card:"summary_large_image",title:"OP8 Operating Partner Value Creation Framework",description:"Daha iyi düşünmek için biraz yavaşla.",images:["/og.png"]}};
-export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="tr"><body><style>{`.site-header{padding-right:190px}.hero-image{width:min(460px,100%);aspect-ratio:4/5;justify-self:end;overflow:hidden;border:1px solid var(--line)}.hero-image img{width:100%;height:100%;object-fit:cover}@media(max-width:800px){.site-header{padding-right:62px;gap:20px}.site-header nav{gap:18px}}`}</style><div className="global-user-menu"><UserMenu/></div>{children}</body></html>}
+export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="tr"><body><div className="global-user-menu"><UserMenu/></div>{children}</body></html>}
+

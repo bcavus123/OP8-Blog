@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 2.3 seconds
+Output:
 # İzlek blog MVP mimarisi
 
 ## Bilgi mimarisi ve sayfa ağacı
@@ -38,3 +41,4 @@ SEO başlığı, meta açıklama, canonical URL, paylaşım başlığı/açıkla
 ## Modüler büyüme sınırları
 
 Sunum, içerik erişimi ve özellik modülleri ayrıdır. Gelecekte üyelik/kimlik, bülten aboneliği ve AI destekleri bağımsız modüller olarak eklenir. İlk fazda bu özellikler için kullanıcı arayüzü, veri tabanı veya yarım çalışan akış bulunmaz.
+

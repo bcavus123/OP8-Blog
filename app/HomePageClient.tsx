@@ -1,40 +1,39 @@
+Exit code: 0
+Wall time: 2.1 seconds
+Output:
 "use client";
 
 import Link from "next/link";
 import { useMemo } from "react";
 import { defaultHomeConfig, HomeConfig, HomeSection, normalizeHomeConfig } from "./homepage-config";
 
-type PublishedPost = { id:number; title:string; slug:string; excerpt:string; categoryId:number|null; categoryName:string|null; coverUrl:string; coverAlt:string; publishedAt:string|null };
-type Topic = { id:number; name:string; slug:string; postCount:number };
+type PublishedPost={id:number;title:string;slug:string;excerpt:string;categoryId:number|null;categoryName:string|null;coverUrl:string;coverAlt:string;publishedAt:string|null};
+type Topic={id:number;name:string;slug:string;postCount:number};
+const dateFormatter=new Intl.DateTimeFormat("tr-TR",{day:"numeric",month:"long",year:"numeric"});
+const publishedDate=(value:string|null)=>value?dateFormatter.format(new Date(value.replace(" ","T")+(value.includes("Z")?"":"Z"))):"";
+const readingTime=(post:PublishedPost)=>`${Math.max(1,Math.ceil((post.excerpt?.split(/\s+/).length||1)/35))} dakika`;
+function choosePosts(section:HomeSection,posts:PublishedPost[],count:number){const selected=section.postIds.map(id=>posts.find(post=>post.id===id)).filter((post):post is PublishedPost=>Boolean(post));return(selected.length?selected:posts).slice(0,count)}
 
-const dateFormatter = new Intl.DateTimeFormat("tr-TR", { day:"numeric", month:"long", year:"numeric" });
-function publishedDate(value:string|null){ return value ? dateFormatter.format(new Date(value.replace(" ", "T") + (value.includes("Z") ? "" : "Z"))) : "" }
-function readingTime(post:PublishedPost){ return `${Math.max(1, Math.ceil((post.excerpt?.split(/\s+/).length || 1) / 35))} dakika` }
-function choosePosts(section:HomeSection, posts:PublishedPost[], fallbackCount:number){
-  const selected = section.postIds.map(id => posts.find(post => post.id === id)).filter((post):post is PublishedPost => Boolean(post));
-  return (selected.length ? selected : posts).slice(0, fallbackCount);
-}
-
-function Featured({section,posts}:{section:HomeSection;posts:PublishedPost[]}){
-  const post=choosePosts(section,posts,1)[0];
-  if(!post)return null;
-  return <section className="featured shell"><div className="feature-art">{post.coverUrl?<img src={post.coverUrl} alt={post.coverAlt}/>:<><span className="feature-number">01</span><p>{post.categoryName||"Yazı"}<br/>Seçkisi</p></>}</div><article className="feature-copy"><p className="kicker">{section.eyebrow} <span>{post.categoryName||"Genel"}</span></p><h2>{post.title}</h2><p>{post.excerpt}</p><div className="meta"><span>{publishedDate(post.publishedAt)}</span><span>{readingTime(post)} okuma</span></div><Link className="text-link" href={`/yazilar/${post.slug}`}>Yazıyı oku <span>→</span></Link></article></section>
-}
-function Latest({section,posts}:{section:HomeSection;posts:PublishedPost[]}){
-  const chosen=choosePosts(section,posts,3);
-  if(!chosen.length)return null;
-  return <section className="posts shell" id="yazilar"><div className="section-head"><div><p className="eyebrow">{section.eyebrow}</p><h2>{section.title}</h2></div></div><div className="post-grid">{chosen.map((post,index)=><article className="post-card" key={post.id}><div className={`card-art ${["mint","lilac","peach"][index%3]}`}>{post.coverUrl?<img src={post.coverUrl} alt={post.coverAlt}/>:<><span>{String(index+1).padStart(2,"0")}</span><div className="shape"/></>}</div><div className="card-body"><p className="kicker">{post.categoryName||"Genel"}</p><h3>{post.title}</h3><p>{post.excerpt}</p><div className="meta"><span>{publishedDate(post.publishedAt)}</span><span>{readingTime(post)}</span></div><Link href={`/yazilar/${post.slug}`}>Okumaya başla →</Link></div></article>)}</div></section>
-}
-function Topics({section,topics}:{section:HomeSection;topics:Topic[]}){
-  if(!topics.length)return null;
-  return <section className="topics shell" id="konular"><p className="eyebrow">{section.eyebrow}</p><h2>{section.title}</h2><div className="topic-list">{topics.map(topic=><a href="#yazilar" key={topic.id}>{topic.name} <span>{topic.postCount} yazı</span></a>)}</div></section>
-}
+function Featured({section,posts}:{section:HomeSection;posts:PublishedPost[]}){const post=choosePosts(section,posts,1)[0];if(!post)return null;return <section className="featured shell"><div className="feature-art">{post.coverUrl?<img src={post.coverUrl} alt={post.coverAlt}/>:<><span className="feature-number">01</span><p>{post.categoryName||"Yazı"}<br/>Seçkisi</p></>}</div><article className="feature-copy"><p className="kicker">{section.eyebrow} <span>{post.categoryName||"Genel"}</span></p><h2>{post.title}</h2><p>{post.excerpt}</p><div className="meta"><span>{publishedDate(post.publishedAt)}</span><span>{readingTime(post)} okuma</span></div><Link className="text-link" href={`/yazilar/${post.slug}`}>Yazıyı oku <span>→</span></Link></article></section>}
+function Latest({section,posts}:{section:HomeSection;posts:PublishedPost[]}){const chosen=choosePosts(section,posts,3);if(!chosen.length)return null;return <section className="posts shell" id="yazilar"><div className="section-head"><div><p className="eyebrow">{section.eyebrow}</p><h2>{section.title}</h2></div></div><div className="post-grid">{chosen.map((post,index)=><article className="post-card" key={post.id}><div className={`card-art ${["mint","lilac","peach"][index%3]}`}>{post.coverUrl?<img src={post.coverUrl} alt={post.coverAlt}/>:<><span>{String(index+1).padStart(2,"0")}</span><div className="shape"/></>}</div><div className="card-body"><p className="kicker">{post.categoryName||"Genel"}</p><h3>{post.title}</h3><p>{post.excerpt}</p><div className="meta"><span>{publishedDate(post.publishedAt)}</span><span>{readingTime(post)}</span></div><Link href={`/yazilar/${post.slug}`}>Okumaya başla →</Link></div></article>)}</div></section>}
+function Topics({section,topics}:{section:HomeSection;topics:Topic[]}){if(!topics.length)return null;return <section className="topics shell" id="konular"><p className="eyebrow">{section.eyebrow}</p><h2>{section.title}</h2><div className="topic-list">{topics.map(topic=><a href="#yazilar" key={topic.id}>{topic.name} <span>{topic.postCount} yazı</span></a>)}</div></section>}
 function ContentSection({section}:{section:HomeSection}){return <section className="custom-home-section shell"><div>{section.imageUrl&&<img src={section.imageUrl} alt={section.imageAlt}/>}</div><article><p className="eyebrow">{section.eyebrow}</p><h2>{section.title}</h2><p>{section.body}</p>{section.buttonLabel&&<a className="button" href={section.buttonHref}>{section.buttonLabel} →</a>}</article></section>}
 function Brand({config,footer=false}:{config:HomeConfig;footer?:boolean}){return <Link className={`brand ${footer?"footer-brand":""}`} href="/">{config.brand.logoUrl?<img className="site-logo" src={config.brand.logoUrl} alt={config.brand.logoAlt} style={{width:config.brand.logoWidth}}/>:<><span>OP8</span>{config.brand.siteName}</>}</Link>}
-function themeStyle(config:HomeConfig){return{"--ink":config.theme.ink,"--paper":config.theme.paper,"--cream":config.theme.cream,"--orange":config.theme.accent,"--line":config.theme.line,"--muted":config.theme.muted,"--font-serif":config.theme.headingFont,"--font-sans":config.theme.bodyFont,background:config.theme.paper,color:config.theme.ink,minHeight:"100vh"}as React.CSSProperties}
+function themeStyle(config:HomeConfig){return{"--ink":config.theme.ink,"--paper":config.theme.paper,"--cream":config.theme.cream,"--orange":config.theme.accent,"--line":config.theme.line,"--muted":config.theme.muted,"--font-serif":config.theme.headingFont,"--font-sans":config.theme.bodyFont,background:config.theme.paper,color:config.theme.ink,minHeight:"100vh"} as React.CSSProperties}
 
 export default function HomePageClient({initialConfig,initialPosts,initialTopics}:{initialConfig:HomeConfig;initialPosts:PublishedPost[];initialTopics:Topic[]}){
   const config=normalizeHomeConfig(initialConfig||defaultHomeConfig),posts=initialPosts||[],topics=initialTopics||[],loaded=true;
   const sections=useMemo(()=>config.sections.filter(section=>section.visible),[config.sections]);
-  return <main style={themeStyle(config)}><header className="site-header shell"><Brand config={config}/><nav>{config.headerMenu.filter(x=>x.visible).map(x=><a href={x.href} key={x.id}>{x.label}</a>)}</nav></header><section className="hero shell"><div><p className="eyebrow">{config.hero.eyebrow}</p><h1>{config.hero.title}<br/><em>{config.hero.accent}</em></h1><p className="hero-copy">{config.hero.description}</p><a className="button" href={config.hero.buttonHref}>{config.hero.buttonLabel} <span>↓</span></a></div>{config.hero.imageUrl?<div className="hero-image"><img src={config.hero.imageUrl} alt={config.hero.imageAlt}/></div>:<div className="hero-mark" aria-hidden="true"><div className="orbit one"/><div className="orbit two"/><div className="sun"/><span>OP8</span></div>}</section>{loaded&&!posts.length&&<section className="shell empty-state" id="yazilar"><h2>İlk yazılar hazırlanıyor.</h2><p>Yayımlanan içerikler otomatik olarak burada görünecek.</p></section>}{sections.map(section=>section.type==="featured"?<Featured section={section} posts={posts} key={section.id}/>:section.type==="latest"?<Latest section={section} posts={posts} key={section.id}/>:section.type==="topics"?<Topics section={section} topics={topics} key={section.id}/>:<ContentSection section={section} key={section.id}/>)}<footer id="hakkinda"><div className="shell footer-inner"><div><Brand config={config} footer/><p>OP8 değer yaratma yaklaşımına ilişkin analizler ve uygulama notları.</p></div><div>{config.headerMenu.filter(x=>x.visible).map(x=><a href={x.href} key={x.id}>{x.label}</a>)}</div><p>© 2026 OP8 Operating Partner Value Creation Framework</p></div></footer></main>
+  return <main style={themeStyle(config)}>
+    <header className="site-header shell"><Brand config={config}/><nav>{config.headerMenu.filter(x=>x.visible).map(x=><a href={x.href} key={x.id}>{x.label}</a>)}</nav></header>
+    <section className={`hero shell ${config.hero.imageUrl?"hero-has-image":""}`}>
+      {config.hero.imageUrl&&<div className="hero-background" aria-hidden="true"><img src={config.hero.imageUrl} alt=""/></div>}
+      <div className="hero-content"><p className="eyebrow" style={config.hero.eyebrowStyle}>{config.hero.eyebrow}</p><h1><span style={config.hero.titleStyle}>{config.hero.title}</span><br/><em style={config.hero.accentStyle}>{config.hero.accent}</em></h1><p className="hero-copy" style={config.hero.descriptionStyle}>{config.hero.description}</p><a className="button" href={config.hero.buttonHref}>{config.hero.buttonLabel} <span>↓</span></a></div>
+      {!config.hero.imageUrl&&<div className="hero-mark" aria-hidden="true"><div className="orbit one"/><div className="orbit two"/><div className="sun"/><span>OP8</span></div>}
+    </section>
+    {loaded&&!posts.length&&<section className="shell empty-state" id="yazilar"><h2>İlk yazılar hazırlanıyor.</h2><p>Yayımlanan içerikler otomatik olarak burada görünecek.</p></section>}
+    {sections.map(section=>section.type==="featured"?<Featured section={section} posts={posts} key={section.id}/>:section.type==="latest"?<Latest section={section} posts={posts} key={section.id}/>:section.type==="topics"?<Topics section={section} topics={topics} key={section.id}/>:<ContentSection section={section} key={section.id}/>)}
+    <footer id="hakkinda"><div className="shell footer-inner"><div><Brand config={config} footer/><p>OP8 değer yaratma yaklaşımına ilişkin analizler ve uygulama notları.</p></div><div>{config.headerMenu.filter(x=>x.visible).map(x=><a href={x.href} key={x.id}>{x.label}</a>)}</div><p>© 2026 OP8 Operating Partner Value Creation Framework</p></div></footer>
+  </main>
 }
+

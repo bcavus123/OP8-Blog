@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 3 seconds
+Output:
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -5,3 +8,4 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+

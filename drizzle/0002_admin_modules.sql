@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 2.9 seconds
+Output:
 CREATE TABLE `tags` (`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,`name` text NOT NULL,`slug` text NOT NULL,`created_at` text DEFAULT 'CURRENT_TIMESTAMP' NOT NULL);
 --> statement-breakpoint
 CREATE UNIQUE INDEX `idx_tags_slug` ON `tags` (`slug`);
@@ -23,3 +26,4 @@ CREATE TABLE `analytics_daily` (`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 CREATE UNIQUE INDEX `idx_analytics_daily_date` ON `analytics_daily` (`date`);
 --> statement-breakpoint
 PRAGMA optimize;
+

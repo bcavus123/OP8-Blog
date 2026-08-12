@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 2.5 seconds
+Output:
 import assert from "node:assert/strict";
 import { access, readFile, readdir } from "node:fs/promises";
 import test from "node:test";
@@ -89,3 +92,4 @@ test("keeps the loading skeleton scoped and disposable", async () => {
     access(new URL("public/_sites-preview", templateRoot)),
   );
 });
+

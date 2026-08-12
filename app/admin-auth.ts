@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 2 seconds
+Output:
 import{headers}from"next/headers";
 import{redirect}from"next/navigation";
 import{getCurrentUser,SiteUser}from"./user-auth";
@@ -9,3 +12,4 @@ export async function getActor():Promise<Actor|null>{const user=await getCurrent
 export async function requirePermission(permission:Permission,returnTo:string){const actor=await getActor();if(!actor)redirect(`/giris?return_to=${encodeURIComponent(returnTo)}`);if(!can(actor,permission))redirect(actor.role==="member"?"/profil":"/admin/yazilar");return actor}
 export async function apiPermission(permission:Permission){const actor=await getActor();if(!actor)return{error:Response.json({error:"Oturum açmanız gerekiyor."},{status:401})};if(!can(actor,permission))return{error:Response.json({error:"Bu işlem için yetkiniz yok."},{status:403})};return{actor}}
 export{roleLabels};
+

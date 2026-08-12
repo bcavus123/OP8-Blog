@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 2.5 seconds
+Output:
 CREATE TABLE `categories` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
@@ -27,3 +30,4 @@ CREATE INDEX `idx_categories_sort_order` ON `categories` (`sort_order`);
 CREATE INDEX `idx_posts_category_id` ON `posts` (`category_id`);
 --> statement-breakpoint
 PRAGMA optimize;
+

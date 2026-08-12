@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 2.5 seconds
+Output:
 import vinext from "vinext";
 import { defineConfig } from "vite";
 import hostingConfig from "./.openai/hosting.json";
@@ -57,3 +60,4 @@ export default defineConfig(async () => {
     ],
   };
 });
+
