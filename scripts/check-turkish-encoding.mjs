@@ -1,0 +1,2 @@
+import{readFileSync}from"node:fs";import{execFileSync}from"node:child_process";
+const files=execFileSync("git",["ls-files","app","db","scripts"],{encoding:"utf8"}).trim().split(/\r?\n/).filter(f=>/\.(?:ts|tsx|mjs|css)$/.test(f));const bad=[];for(const file of files){const text=readFileSync(file,"utf8");if(/Ã.|Ä.|Å.|â€|â€¦|â—|�/.test(text))bad.push(file)}if(bad.length){console.error(`Bozuk Türkçe kodlama: ${bad.join(", ")}`);process.exit(1)}console.log("Türkçe UTF-8 kontrolü başarılı.");

@@ -16,6 +16,7 @@
     "hostinger:build": "npm run db:init && npm run build",
     "test:env": "node scripts/test-env.mjs",
     "test:permissions": "node --test tests/permissions.test.mjs",
+    "test:encoding": "node scripts/check-turkish-encoding.mjs",
     "test:rbac:mysql": "node scripts/test-rbac-mysql.mjs"
   },
   "dependencies": {
