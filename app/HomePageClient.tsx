@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { defaultHomeConfig, HomeConfig, HomeSection, normalizeHomeConfig } from "./homepage-config";
 
 type PublishedPost = { id:number; title:string; slug:string; excerpt:string; categoryId:number|null; categoryName:string|null; coverUrl:string; coverAlt:string; publishedAt:string|null };
@@ -33,9 +33,8 @@ function ContentSection({section}:{section:HomeSection}){return <section classNa
 function Brand({config,footer=false}:{config:HomeConfig;footer?:boolean}){return <Link className={`brand ${footer?"footer-brand":""}`} href="/">{config.brand.logoUrl?<img className="site-logo" src={config.brand.logoUrl} alt={config.brand.logoAlt} style={{width:config.brand.logoWidth}}/>:<><span>OP8</span>{config.brand.siteName}</>}</Link>}
 function themeStyle(config:HomeConfig){return{"--ink":config.theme.ink,"--paper":config.theme.paper,"--cream":config.theme.cream,"--orange":config.theme.accent,"--line":config.theme.line,"--muted":config.theme.muted,"--font-serif":config.theme.headingFont,"--font-sans":config.theme.bodyFont,background:config.theme.paper,color:config.theme.ink,minHeight:"100vh"}as React.CSSProperties}
 
-export default function HomePageClient(){
-  const[config,setConfig]=useState<HomeConfig>(defaultHomeConfig),[posts,setPosts]=useState<PublishedPost[]>([]),[topics,setTopics]=useState<Topic[]>([]),[loaded,setLoaded]=useState(false);
-  useEffect(()=>{Promise.all([fetch("/api/homepage").then(r=>r.json()),fetch("/api/posts").then(r=>r.json())]).then(([home,content])=>{if(home.item)setConfig(normalizeHomeConfig(home.item));setPosts(content.posts||[]);setTopics(content.topics||[])}).finally(()=>setLoaded(true))},[]);
+export default function HomePageClient({initialConfig,initialPosts,initialTopics}:{initialConfig:HomeConfig;initialPosts:PublishedPost[];initialTopics:Topic[]}){
+  const config=normalizeHomeConfig(initialConfig||defaultHomeConfig),posts=initialPosts||[],topics=initialTopics||[],loaded=true;
   const sections=useMemo(()=>config.sections.filter(section=>section.visible),[config.sections]);
   return <main style={themeStyle(config)}><header className="site-header shell"><Brand config={config}/><nav>{config.headerMenu.filter(x=>x.visible).map(x=><a href={x.href} key={x.id}>{x.label}</a>)}</nav></header><section className="hero shell"><div><p className="eyebrow">{config.hero.eyebrow}</p><h1>{config.hero.title}<br/><em>{config.hero.accent}</em></h1><p className="hero-copy">{config.hero.description}</p><a className="button" href={config.hero.buttonHref}>{config.hero.buttonLabel} <span>↓</span></a></div>{config.hero.imageUrl?<div className="hero-image"><img src={config.hero.imageUrl} alt={config.hero.imageAlt}/></div>:<div className="hero-mark" aria-hidden="true"><div className="orbit one"/><div className="orbit two"/><div className="sun"/><span>OP8</span></div>}</section>{loaded&&!posts.length&&<section className="shell empty-state" id="yazilar"><h2>İlk yazılar hazırlanıyor.</h2><p>Yayımlanan içerikler otomatik olarak burada görünecek.</p></section>}{sections.map(section=>section.type==="featured"?<Featured section={section} posts={posts} key={section.id}/>:section.type==="latest"?<Latest section={section} posts={posts} key={section.id}/>:section.type==="topics"?<Topics section={section} topics={topics} key={section.id}/>:<ContentSection section={section} key={section.id}/>)}<footer id="hakkinda"><div className="shell footer-inner"><div><Brand config={config} footer/><p>OP8 değer yaratma yaklaşımına ilişkin analizler ve uygulama notları.</p></div><div>{config.headerMenu.filter(x=>x.visible).map(x=><a href={x.href} key={x.id}>{x.label}</a>)}</div><p>© 2026 OP8 Operating Partner Value Creation Framework</p></div></footer></main>
 }
