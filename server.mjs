@@ -1,6 +1,9 @@
 import { resolve } from "node:path";
+import { existsSync } from "node:fs";
 
 import { startProdServer } from "vinext/server/prod-server";
+
+if (existsSync(".env.local")) process.loadEnvFile(".env.local");
 
 const port = Number(process.env.PORT || 3000);
 

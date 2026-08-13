@@ -7,7 +7,7 @@ const files = execFileSync("git", ["ls-files", "app", "db", "scripts"], { encodi
 const bad = [];
 for (const file of files) {
   const source = readFileSync(file, "utf8");
-  if (/Ãƒ.|Ã„.|Ã….|Ã¢â‚¬|Ã¢â‚¬Â¦|Ã¢â€”|ï¿½/.test(source)) bad.push(file);
+  if (/Ã|Ä|Å|Â|â(?:†|€“|€™|€¦|€¢)|ï¿½|�/.test(source)) bad.push(file);
 }
 if (bad.length) {
   console.error(`Bozuk Türkçe kodlama: ${bad.join(", ")}`);

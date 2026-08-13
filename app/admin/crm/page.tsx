@@ -1,0 +1,1 @@
+import{requirePermission}from"../../admin-auth";import{AdminNav}from"../AdminNav";import CrmManager from"./CrmManager";import"./crm.css";export const dynamic="force-dynamic";export default async function CrmPage(){const actor=await requirePermission("crm.manage","/admin/crm");return <main><AdminNav active="/admin/crm" actor={actor}/><CrmManager/></main>}

@@ -1,4 +1,6 @@
 ﻿import type { Metadata } from "next";import "./globals.css";import"./home-extra.css";import"./logo.css";import{UserMenu}from"./components/UserMenu";
+import "./admin/admin-dashboard.css";
+import { AnalyticsTracker } from "./components/AnalyticsTracker";
 export const dynamic="force-dynamic";
 export const metadata:Metadata={title:{default:"OP8 Operating Partner Value Creation Framework — Düşünce, teknoloji ve günlük hayat",template:"%s | OP8 Operating Partner Value Creation Framework"},description:"İş, teknoloji ve gündelik hayatın kesişiminden berrak fikirler.",icons:{icon:"/favicon.svg"},openGraph:{title:"OP8 Operating Partner Value Creation Framework",description:"Daha iyi düşünmek için biraz yavaşla.",type:"website",locale:"tr_TR",images:[{url:"/og.png",width:1733,height:909,alt:"OP8 Operating Partner Value Creation Framework — Daha iyi düşünmek için biraz yavaşla."}]},twitter:{card:"summary_large_image",title:"OP8 Operating Partner Value Creation Framework",description:"Daha iyi düşünmek için biraz yavaşla.",images:["/og.png"]}};
-export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="tr"><body><div className="global-user-menu"><UserMenu/></div>{children}</body></html>}
+export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="tr"><body><AnalyticsTracker/><div className="global-user-menu"><UserMenu/></div>{children}</body></html>}
