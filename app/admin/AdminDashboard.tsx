@@ -1,9 +1,9 @@
 "use client";
 
-import { CSSProperties, useEffect, useMemo, useState } from "react";
+import { CSSProperties, useEffect, useState } from "react";
 
 export type DashboardData = {
-  stats: { posts: number; categories: number; media: number; users: number };
+  stats: { posts: number; published: number; draft: number; review: number; scheduled: number; seoIssues: number; categories: number; media: number; users: number };
   recent: Array<{ id: number; title: string; status: string; updatedAt: string }>;
   analytics: Array<{ date: string; views: number; visitors: number }>;
 };
@@ -26,12 +26,10 @@ function initials(name: string) {
 
 export default function AdminDashboard({ displayName, initialData }: { displayName: string; initialData?: DashboardData }) {
   const [data, setData] = useState<DashboardData | null>(initialData ?? null);
-  const [query, setQuery] = useState("");
-
   useEffect(() => {
     if (initialData) return;
-    const empty: DashboardData = { stats: { posts: 0, categories: 0, media: 0, users: 0 }, recent: [], analytics: [] };
-    fetch("/api/admin/modules?module=dashboard")
+    const empty: DashboardData = { stats: { posts: 0, published: 0, draft: 0, review: 0, scheduled: 0, seoIssues: 0, categories: 0, media: 0, users: 0 }, recent: [], analytics: [] };
+    fetch("/api/admin/dashboard")
       .then(async (response) => {
         if (!response.ok) throw new Error(`Dashboard verisi alınamadı: ${response.status}`);
         const payload = await response.json() as Partial<DashboardData>;
@@ -42,19 +40,15 @@ export default function AdminDashboard({ displayName, initialData }: { displayNa
   }, [initialData]);
 
   const posts = data?.stats.posts ?? 0;
-  const recent = useMemo(() => (data?.recent ?? []).filter((post) => post.title.toLocaleLowerCase("tr-TR").includes(query.toLocaleLowerCase("tr-TR"))), [data, query]);
-  const published = data?.recent.filter((post) => post.status === "published").length ?? 0;
-  const draft = data?.recent.filter((post) => post.status === "draft").length ?? 0;
+  const recent = data?.recent ?? [];
   const summary = [
-    ["Toplam İçerik", posts, "#0874ed", "▤"], ["Yayında", published, "#46aa5d", "✓"],
-    ["Taslak", draft, "#ffb000", "✎"], ["İncelemede", 0, "#7245cb", "♙"],
-    ["Planlandı", 0, "#f05d18", "▣"], ["SEO Sorunu", 0, "#ed4148", "△"],
+    ["Toplam İçerik", posts, "#0874ed", "▤"], ["Yayında", data?.stats.published ?? 0, "#46aa5d", "✓"],
+    ["Taslak", data?.stats.draft ?? 0, "#ffb000", "✎"], ["İncelemede", data?.stats.review ?? 0, "#7245cb", "♙"],
+    ["Planlandı", data?.stats.scheduled ?? 0, "#f05d18", "▣"], ["SEO Sorunu", data?.stats.seoIssues ?? 0, "#ed4148", "△"],
   ] as const;
 
   return <div className="op8-dashboard">
     <div className="op8-topbar">
-      <label className="op8-search"><span aria-hidden="true">⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="İçerik ara..." aria-label="İçerik ara" /></label>
-      <button className="op8-create" onClick={() => location.href = "/admin/yazilar"}>＋ Yeni İçerik　⌄</button>
       <a className="op8-notification" href="/admin/seo" aria-label="Bildirimler">♧<b>3</b></a>
       <span className="op8-top-avatar">{initials(displayName)}</span>
     </div>
