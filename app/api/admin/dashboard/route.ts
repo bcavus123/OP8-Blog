@@ -15,6 +15,9 @@ export async function GET() {
   const [allPosts, [categoryCount], [mediaCount], [userCount], recent, analytics] = await Promise.all([
     db.select({
       status: posts.status,
+      slug: posts.slug,
+      content: posts.content,
+      categoryId: posts.categoryId,
       seoTitle: posts.seoTitle,
       seoDescription: posts.seoDescription,
       coverUrl: posts.coverUrl,
@@ -34,6 +37,7 @@ export async function GET() {
     || !post.seoDescription.trim()
     || Boolean(post.coverUrl && !post.coverAlt.trim())
   ).length;
+  const seo = seoHealth(allPosts);
 
   const opportunities = await refreshContentOpportunities();
   const performance = await performanceMetrics();
@@ -53,9 +57,44 @@ export async function GET() {
     },
     recent,
     opportunities: opportunities.slice(0, 3),
+    seo,
     performance,
     analytics: analytics.reverse(),
   });
+}
+
+type SeoPost = { status: string; slug: string; content: string; categoryId: number | null; seoTitle: string; seoDescription: string; coverUrl: string; coverAlt: string };
+function seoHealth(items: SeoPost[]) {
+  const publishedSlugs = new Set(items.filter((item) => item.status === "published").map((item) => item.slug));
+  const inboundSlugs = new Set<string>(); let brokenLinks = 0, missingAlt = 0, totalScore = 0, metaIssues = 0;
+  for (const item of items) {
+    let score = 100; const words = item.content.replace(/<[^>]*>/g, " ").split(/\s+/).filter(Boolean).length;
+    const marker = item.content.match(/^<!--op8-style:(.*?)-->/); let advanced: Record<string, unknown> = {};
+    try { advanced = marker ? JSON.parse(marker[1]).seo || {} : {}; } catch {}
+    const badTitle = !item.seoTitle || item.seoTitle.length > 60;
+    const badDescription = !item.seoDescription || item.seoDescription.length < 120 || item.seoDescription.length > 160;
+    if (badTitle || badDescription) metaIssues++;
+    if (!item.seoTitle) score -= 18; else if (item.seoTitle.length > 60) score -= 8;
+    if (!item.seoDescription) score -= 18; else if (item.seoDescription.length < 120 || item.seoDescription.length > 160) score -= 7;
+    if (!item.slug) score -= 12;
+    if (item.coverUrl && !item.coverAlt) { score -= 10; missingAlt++; }
+    const images = [...item.content.matchAll(/<img\b[^>]*>/gi)];
+    for (const image of images) if (!/\balt\s*=\s*["'][^"']+["']/i.test(image[0])) missingAlt++;
+    if (words < 300) score -= 8;
+    if (!/<h[2-6]/i.test(item.content)) score -= 6;
+    if (!advanced.primaryKeyword) score -= 8;
+    if (!advanced.canonicalUrl) score -= 5;
+    if (!advanced.schemaType) score -= 5;
+    totalScore += Math.max(0, score);
+    for (const link of item.content.matchAll(/href\s*=\s*["']([^"']+)["']/gi)) {
+      const match = link[1].match(/^\/yazilar\/([^/?#]+)/);
+      if (!match) continue;
+      const slug = decodeURIComponent(match[1]); inboundSlugs.add(slug);
+      if (!publishedSlugs.has(slug)) brokenLinks++;
+    }
+  }
+  const orphanPages = items.filter((item) => item.status === "published" && item.categoryId === null && !inboundSlugs.has(item.slug)).length;
+  return { score: items.length ? Math.round(totalScore / items.length) : 0, metaIssues, brokenLinks, orphanPages, missingAlt };
 }
 
 const change = (current: number, previous: number) => previous ? Math.round(((current - previous) / previous) * 1000) / 10 : current ? 100 : 0;
