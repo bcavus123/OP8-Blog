@@ -1,8 +1,9 @@
 import { desc, eq, or, sql } from "drizzle-orm";
 import { getDb, getPool } from "../../../../db";
-import { adminUsers, analyticsDaily, categories, media, posts } from "../../../../db/schema";
+import { adminUsers, analyticsDaily, categories, contentActivities, media, posts } from "../../../../db/schema";
 import { getChatGPTUser } from "../../../chatgpt-auth";
 import { refreshContentOpportunities } from "../../../content-opportunities";
+import { ensureContentActivityTable } from "../../../content-activity";
 
 export async function GET() {
   const user = await getChatGPTUser();
@@ -11,8 +12,9 @@ export async function GET() {
   const [admin] = await db.select({ status: adminUsers.status }).from(adminUsers)
     .where(or(eq(adminUsers.userId, user.userId), eq(adminUsers.email, user.email))).limit(1);
   if (!admin || admin.status !== "active") return Response.json({ error: "Yetkisiz" }, { status: 401 });
+  await ensureContentActivityTable();
 
-  const [allPosts, [categoryCount], [mediaCount], [userCount], recent, analytics] = await Promise.all([
+  const [allPosts, [categoryCount], [mediaCount], [userCount], recent, analytics, activityRows] = await Promise.all([
     db.select({
       status: posts.status,
       slug: posts.slug,
@@ -29,6 +31,7 @@ export async function GET() {
     db.select({ id: posts.id, title: posts.title, status: posts.status, updatedAt: posts.updatedAt })
       .from(posts).orderBy(desc(posts.updatedAt)).limit(5),
     db.select().from(analyticsDaily).orderBy(desc(analyticsDaily.date)).limit(7),
+    db.select().from(contentActivities).orderBy(desc(contentActivities.createdAt), desc(contentActivities.id)).limit(8),
   ]);
 
   const countStatus = (status: string) => allPosts.filter((post) => post.status === status).length;
@@ -56,6 +59,7 @@ export async function GET() {
       users: Number(userCount.value),
     },
     recent,
+    activities: activityRows.length ? activityRows : recent.map((post) => ({ id: post.id, postId: post.id, postTitle: post.title, action: "updated", description: `“${post.title}” güncellendi.`, actorEmail: "", createdAt: post.updatedAt })),
     opportunities: opportunities.slice(0, 3),
     seo,
     performance,

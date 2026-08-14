@@ -2,6 +2,7 @@ import { and, asc, desc, eq } from "drizzle-orm";
 import { getDb } from "../../../../db";
 import { categories, posts } from "../../../../db/schema";
 import { Actor, apiPermission, can } from "../../../admin-auth";
+import { recordContentActivity } from "../../../content-activity";
 
 const allStatuses = ["idea", "draft", "review", "approved", "scheduled", "published"] as const;
 type EditorialStatus = typeof allStatuses[number];
@@ -74,6 +75,7 @@ export async function POST(request: Request) {
   if (!value.title || !value.slug) return Response.json({ error: "Başlık ve geçerli slug zorunludur." }, { status: 400 });
   try {
     const ids = await getDb().insert(posts).values({ ...value, authorId: access.actor.bootstrap ? null : Number(access.actor.userId) }).$returningId();
+    await recordContentActivity({ postId: ids[0].id, postTitle: value.title, action: "created", description: `“${value.title}” ${requested === "idea" ? "fikir olarak" : "içerik olarak"} oluşturuldu.`, actorEmail: access.actor.email });
     return Response.json({ id: ids[0].id }, { status: 201 });
   } catch { return Response.json({ error: "Bu slug zaten kullanılıyor." }, { status: 409 }); }
 }
@@ -93,6 +95,7 @@ export async function PUT(request: Request) {
   if (!value.title || !value.slug) return Response.json({ error: "Eksik alan var." }, { status: 400 });
   try {
     await getDb().update(posts).set(value).where(eq(posts.id, id));
+    await recordContentActivity({ postId: id, postTitle: value.title, action: "updated", description: `“${value.title}” güncellendi.`, actorEmail: access.actor.email });
     return Response.json({ ok: true });
   } catch { return Response.json({ error: "Bu slug zaten kullanılıyor." }, { status: 409 }); }
 }
@@ -109,6 +112,9 @@ export async function PATCH(request: Request) {
     status,
     publishedAt: status === "published" ? now() : status === "scheduled" ? publishedAt : null,
   }).where(eq(posts.id, id));
+  const [post] = await getDb().select({ title: posts.title }).from(posts).where(eq(posts.id, id));
+  const actionLabels: Record<string, string> = { idea: "Fikir aşamasına alındı", draft: "Taslağa alındı", review: "İncelemeye gönderildi", approved: "Onaylandı", scheduled: "Yayınlanmak üzere planlandı", published: "Yayımlandı" };
+  await recordContentActivity({ postId: id, postTitle: post?.title || "İçerik", action: status, description: `“${post?.title || "İçerik"}” ${actionLabels[status]}.`, actorEmail: access.actor.email });
   return Response.json({ ok: true });
 }
 
@@ -117,6 +123,8 @@ export async function DELETE(request: Request) {
   if (access.error) return access.error;
   const { id } = await request.json() as { id?: number };
   if (!id) return Response.json({ error: "Yazı bulunamadı." }, { status: 400 });
+  const [post] = await getDb().select({ title: posts.title }).from(posts).where(eq(posts.id, id));
   await getDb().delete(posts).where(eq(posts.id, id));
+  await recordContentActivity({ postId: null, postTitle: post?.title || "İçerik", action: "deleted", description: `“${post?.title || "İçerik"}” silindi.`, actorEmail: access.actor.email });
   return Response.json({ ok: true });
 }

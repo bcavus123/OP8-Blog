@@ -3,6 +3,7 @@ import { getDb } from "../../../../db";
 import { contentOpportunities, posts } from "../../../../db/schema";
 import { apiPermission } from "../../../admin-auth";
 import { ensureOpportunityTable, refreshContentOpportunities } from "../../../content-opportunities";
+import { recordContentActivity } from "../../../content-activity";
 
 const slugify = (value: string) => value.toLocaleLowerCase("tr-TR").normalize("NFD")
   .replace(/[\u0300-\u036f]/g, "").replace(/ı/g, "i").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 70);
@@ -38,5 +39,6 @@ export async function POST(request: Request) {
     coverUrl: "", coverAlt: "", seoTitle: item.title.slice(0, 60), seoDescription: item.description.slice(0, 160), publishedAt: null,
   }).$returningId();
   await db.update(contentOpportunities).set({ status: "converted", postId: ids[0].id }).where(eq(contentOpportunities.id, id));
+  await recordContentActivity({ postId: ids[0].id, postTitle: item.title, action: "idea", description: `“${item.title}” içerik fırsatından Fikir aşamasında oluşturuldu.`, actorEmail: access.actor.email });
   return Response.json({ ok: true, postId: ids[0].id, status: "idea" }, { status: 201 });
 }
