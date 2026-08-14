@@ -1,0 +1,23 @@
+CREATE TABLE IF NOT EXISTS content_opportunities (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  source_key VARCHAR(190) NOT NULL UNIQUE,
+  title VARCHAR(255) NOT NULL,
+  description TEXT NOT NULL,
+  engine VARCHAR(64) NOT NULL,
+  framework_area_id INT NULL,
+  category_id INT NULL,
+  content_type VARCHAR(50) NOT NULL DEFAULT 'article',
+  priority VARCHAR(24) NOT NULL DEFAULT 'medium',
+  focus_keyword VARCHAR(190) NOT NULL,
+  suggested_publish_at TIMESTAMP NULL,
+  status VARCHAR(24) NOT NULL DEFAULT 'suggested',
+  post_id INT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_content_opportunity_status(status),
+  INDEX idx_content_opportunity_engine(engine),
+  INDEX idx_content_opportunity_priority(priority),
+  CONSTRAINT fk_opportunity_framework FOREIGN KEY(framework_area_id) REFERENCES framework_areas(id) ON DELETE SET NULL,
+  CONSTRAINT fk_opportunity_category FOREIGN KEY(category_id) REFERENCES categories(id) ON DELETE SET NULL,
+  CONSTRAINT fk_opportunity_post FOREIGN KEY(post_id) REFERENCES posts(id) ON DELETE SET NULL
+);

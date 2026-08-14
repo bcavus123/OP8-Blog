@@ -6,6 +6,7 @@ export type DashboardData = {
   stats: { posts: number; idea: number; published: number; draft: number; review: number; approved: number; scheduled: number; seoIssues: number; categories: number; media: number; users: number };
   recent: Array<{ id: number; title: string; status: string; updatedAt: string }>;
   analytics: Array<{ date: string; views: number; visitors: number }>;
+  opportunities: Array<{ id: number; title: string; description: string; engine: string; priority: string; contentType: string; suggestedPublishAt: string | null }>;
 };
 
 const engines = [
@@ -28,7 +29,7 @@ export default function AdminDashboard({ displayName, initialData }: { displayNa
   const [data, setData] = useState<DashboardData | null>(initialData ?? null);
   useEffect(() => {
     if (initialData) return;
-    const empty: DashboardData = { stats: { posts: 0, idea: 0, published: 0, draft: 0, review: 0, approved: 0, scheduled: 0, seoIssues: 0, categories: 0, media: 0, users: 0 }, recent: [], analytics: [] };
+    const empty: DashboardData = { stats: { posts: 0, idea: 0, published: 0, draft: 0, review: 0, approved: 0, scheduled: 0, seoIssues: 0, categories: 0, media: 0, users: 0 }, recent: [], analytics: [], opportunities: [] };
     fetch("/api/admin/dashboard")
       .then(async (response) => {
         if (!response.ok) throw new Error(`Dashboard verisi alınamadı: ${response.status}`);
@@ -46,6 +47,7 @@ export default function AdminDashboard({ displayName, initialData }: { displayNa
     ["Taslak", data?.stats.draft ?? 0, "#ffb000", "✎"], ["İncelemede", data?.stats.review ?? 0, "#7245cb", "♙"],
     ["Planlandı", data?.stats.scheduled ?? 0, "#f05d18", "▣"], ["SEO Sorunu", data?.stats.seoIssues ?? 0, "#ed4148", "△"],
   ] as const;
+  async function convertOpportunity(id: number) { const response = await fetch("/api/admin/content-opportunities", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ id, action: "convert" }) }); const payload = await response.json(); if (!response.ok) { alert(payload.error || "Fırsat fikre dönüştürülemedi."); return; } location.href = "/admin/yazilar"; }
 
   return <div className="op8-dashboard">
     <div className="op8-topbar">
@@ -68,7 +70,7 @@ export default function AdminDashboard({ displayName, initialData }: { displayNa
       <section className="op8-panel"><h2>OP8 Framework Kapsamı</h2><div className="op8-engine-list">{engines.map(([name, score, color]) => <div className="op8-engine-row" key={name} style={{ "--engine": color } as CSSProperties}><span>{name}</span><span className="op8-engine-track"><i style={{ width: `${score}%` }} /></span><span>{score}%</span></div>)}</div></section>
       <section className="op8-panel"><h2>Editoryal Akış</h2><div className="op8-pipeline">{pipeline.map(([label, status, color, icon]) => <div className="op8-pipeline-step" key={label} style={{ "--step": color } as CSSProperties}><i>{icon}</i><span>{label}</span><strong>{data?.stats[status] ?? 0}</strong></div>)}</div></section>
       <section className="op8-panel"><h2>SEO Sağlığı</h2><div className="op8-seo"><div><div className="op8-score">86</div><a className="op8-view-link" href="/admin/seo">SEO raporunu aç →</a></div><div className="op8-issue-list"><span style={{ "--issue": "#ef3b43" } as CSSProperties}>0 Meta sorunu</span><span style={{ "--issue": "#f47521" } as CSSProperties}>0 Kırık bağlantı</span><span style={{ "--issue": "#f0b300" } as CSSProperties}>0 Sahipsiz sayfa</span><span style={{ "--issue": "#0873ed" } as CSSProperties}>0 Eksik alt metin</span></div></div></section>
-      <section className="op8-panel"><h2>İçerik Fırsatları</h2><div className="op8-opportunities"><div className="op8-opportunity"><span>♡</span><div><strong>Customer Success kapsamını artırın</strong><small>Bu değer motorunda yeni içerik fırsatları var.</small></div></div><div className="op8-opportunity"><span>◔</span><div><strong>Portfolio içerik planı</strong><small>Framework kapsamını yeni yazılarla genişletin.</small></div></div><div className="op8-opportunity"><span>▤</span><div><strong>100 Günlük Plan serisi</strong><small>Operating Partner metodolojisini derinleştirin.</small></div></div></div><a className="op8-view-link" href="/admin/yazilar">İçerik planına git →</a></section>
+      <section className="op8-panel"><h2>İçerik Fırsatları</h2><div className="op8-opportunities">{(data?.opportunities ?? []).map((item) => <div className="op8-opportunity" key={item.id}><span>{item.priority === "high" ? "!" : "◔"}</span><div><strong>{item.title}</strong><small>{item.engine} · {item.description}</small></div><button onClick={() => convertOpportunity(item.id)}>Fikre dönüştür</button></div>)}{!data?.opportunities?.length && <div className="op8-opportunity"><span>✓</span><div><strong>Yeni içerik açığı bulunmadı</strong><small>Framework kapsamı ve mevcut içerikler dengeli görünüyor.</small></div></div>}</div><a className="op8-view-link" href="/admin/yazilar">İçerik planına git →</a></section>
       <section className="op8-panel"><h2>Son Hareketler</h2><div className="op8-activity">{(data?.recent ?? []).slice(0, 4).map((post, index) => <div className="op8-activity-row" key={post.id}><span>{index === 0 ? "Bugün" : `${index + 1} gün`}</span><strong>“{post.title}” güncellendi</strong></div>)}{!data?.recent.length && <div className="op8-activity-row"><span>—</span><strong>Henüz hareket bulunmuyor.</strong></div>}</div><a className="op8-view-link" href="/admin/yazilar">Tüm hareketler →</a></section>
       <section className="op8-panel op8-performance"><Metric label="Organik Trafik" value={String((data?.analytics ?? []).reduce((sum, day) => sum + Number(day.views), 0))} color="#0873ed"/><Metric label="Etkileşim (Ort. Süre)" value="02:48" color="#7743ee"/><Metric label="Framework Ziyareti" value={String((data?.analytics ?? []).reduce((sum, day) => sum + Number(day.visitors), 0))} color="#10a6a6"/><Metric label="Potansiyel Müşteri" value="0" color="#f36a21"/></section>
     </div>

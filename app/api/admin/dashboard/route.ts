@@ -2,6 +2,7 @@ import { desc, eq, or, sql } from "drizzle-orm";
 import { getDb } from "../../../../db";
 import { adminUsers, analyticsDaily, categories, media, posts } from "../../../../db/schema";
 import { getChatGPTUser } from "../../../chatgpt-auth";
+import { refreshContentOpportunities } from "../../../content-opportunities";
 
 export async function GET() {
   const user = await getChatGPTUser();
@@ -34,6 +35,7 @@ export async function GET() {
     || Boolean(post.coverUrl && !post.coverAlt.trim())
   ).length;
 
+  const opportunities = await refreshContentOpportunities();
   return Response.json({
     stats: {
       posts: allPosts.length,
@@ -49,6 +51,7 @@ export async function GET() {
       users: Number(userCount.value),
     },
     recent,
+    opportunities: opportunities.slice(0, 3),
     analytics: analytics.reverse(),
   });
 }
