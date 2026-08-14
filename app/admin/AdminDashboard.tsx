@@ -7,6 +7,7 @@ export type DashboardData = {
   recent: Array<{ id: number; title: string; status: string; updatedAt: string }>;
   analytics: Array<{ date: string; views: number; visitors: number }>;
   opportunities: Array<{ id: number; title: string; description: string; engine: string; priority: string; contentType: string; suggestedPublishAt: string | null }>;
+  performance: Record<"organic" | "engagement" | "framework" | "leads", { value: number; change: number; series: number[] }>;
 };
 
 const engines = [
@@ -29,7 +30,8 @@ export default function AdminDashboard({ displayName, initialData }: { displayNa
   const [data, setData] = useState<DashboardData | null>(initialData ?? null);
   useEffect(() => {
     if (initialData) return;
-    const empty: DashboardData = { stats: { posts: 0, idea: 0, published: 0, draft: 0, review: 0, approved: 0, scheduled: 0, seoIssues: 0, categories: 0, media: 0, users: 0 }, recent: [], analytics: [], opportunities: [] };
+    const emptyMetric = { value: 0, change: 0, series: [] };
+    const empty: DashboardData = { stats: { posts: 0, idea: 0, published: 0, draft: 0, review: 0, approved: 0, scheduled: 0, seoIssues: 0, categories: 0, media: 0, users: 0 }, recent: [], analytics: [], opportunities: [], performance: { organic: emptyMetric, engagement: emptyMetric, framework: emptyMetric, leads: emptyMetric } };
     fetch("/api/admin/dashboard")
       .then(async (response) => {
         if (!response.ok) throw new Error(`Dashboard verisi alınamadı: ${response.status}`);
@@ -72,12 +74,13 @@ export default function AdminDashboard({ displayName, initialData }: { displayNa
       <section className="op8-panel"><h2>SEO Sağlığı</h2><div className="op8-seo"><div><div className="op8-score">86</div><a className="op8-view-link" href="/admin/seo">SEO raporunu aç →</a></div><div className="op8-issue-list"><span style={{ "--issue": "#ef3b43" } as CSSProperties}>0 Meta sorunu</span><span style={{ "--issue": "#f47521" } as CSSProperties}>0 Kırık bağlantı</span><span style={{ "--issue": "#f0b300" } as CSSProperties}>0 Sahipsiz sayfa</span><span style={{ "--issue": "#0873ed" } as CSSProperties}>0 Eksik alt metin</span></div></div></section>
       <section className="op8-panel"><h2>İçerik Fırsatları</h2><div className="op8-opportunities">{(data?.opportunities ?? []).map((item) => <div className="op8-opportunity" key={item.id}><span>{item.priority === "high" ? "!" : "◔"}</span><div><strong>{item.title}</strong><small>{item.engine} · {item.description}</small></div><button onClick={() => convertOpportunity(item.id)}>Fikre dönüştür</button></div>)}{!data?.opportunities?.length && <div className="op8-opportunity"><span>✓</span><div><strong>Yeni içerik açığı bulunmadı</strong><small>Framework kapsamı ve mevcut içerikler dengeli görünüyor.</small></div></div>}</div><a className="op8-view-link" href="/admin/yazilar">İçerik planına git →</a></section>
       <section className="op8-panel"><h2>Son Hareketler</h2><div className="op8-activity">{(data?.recent ?? []).slice(0, 4).map((post, index) => <div className="op8-activity-row" key={post.id}><span>{index === 0 ? "Bugün" : `${index + 1} gün`}</span><strong>“{post.title}” güncellendi</strong></div>)}{!data?.recent.length && <div className="op8-activity-row"><span>—</span><strong>Henüz hareket bulunmuyor.</strong></div>}</div><a className="op8-view-link" href="/admin/yazilar">Tüm hareketler →</a></section>
-      <section className="op8-panel op8-performance"><Metric label="Organik Trafik" value={String((data?.analytics ?? []).reduce((sum, day) => sum + Number(day.views), 0))} color="#0873ed"/><Metric label="Etkileşim (Ort. Süre)" value="02:48" color="#7743ee"/><Metric label="Framework Ziyareti" value={String((data?.analytics ?? []).reduce((sum, day) => sum + Number(day.visitors), 0))} color="#10a6a6"/><Metric label="Potansiyel Müşteri" value="0" color="#f36a21"/></section>
+      <section className="op8-panel op8-performance"><Metric label="Organik Trafik" value={String(data?.performance?.organic.value ?? 0)} change={data?.performance?.organic.change ?? 0} series={data?.performance?.organic.series ?? []} color="#0873ed"/><Metric label="Etkileşim (Ort. Süre)" value={formatDuration(data?.performance?.engagement.value ?? 0)} change={data?.performance?.engagement.change ?? 0} series={data?.performance?.engagement.series ?? []} color="#7743ee"/><Metric label="Framework Ziyareti" value={String(data?.performance?.framework.value ?? 0)} change={data?.performance?.framework.change ?? 0} series={data?.performance?.framework.series ?? []} color="#10a6a6"/><Metric label="Potansiyel Müşteri" value={String(data?.performance?.leads.value ?? 0)} change={data?.performance?.leads.change ?? 0} series={data?.performance?.leads.series ?? []} color="#f36a21"/></section>
     </div>
   </div>;
 }
 
-function Metric({ label, value, color }: { label: string; value: string; color: string }) {
-  const heights = [32, 44, 38, 58, 42, 66, 50, 62, 45, 68, 55, 72];
-  return <div className="op8-metric"><span>{label}</span><strong>{value}</strong><em>▲ 0%</em><div className="op8-spark" style={{ "--spark": color } as CSSProperties}>{heights.map((height, index) => <i key={index} style={{ "--h": `${height}%` } as CSSProperties} />)}</div></div>;
+function formatDuration(seconds: number) { const minutes = Math.floor(seconds / 60), remainder = Math.max(0, Math.round(seconds % 60)); return `${String(minutes).padStart(2, "0")}:${String(remainder).padStart(2, "0")}`; }
+function Metric({ label, value, color, change, series }: { label: string; value: string; color: string; change: number; series: number[] }) {
+  const source = series.length ? series : [0, 0, 0, 0, 0, 0, 0]; const max = Math.max(1, ...source); const heights = source.map((item) => Math.max(8, Math.round((item / max) * 100)));
+  return <div className="op8-metric"><span>{label}</span><strong>{value}</strong><em className={change < 0 ? "negative" : ""}>{change < 0 ? "▼" : "▲"} {Math.abs(change)}%</em><div className="op8-spark" style={{ "--spark": color } as CSSProperties}>{heights.map((height, index) => <i key={index} style={{ "--h": `${height}%` } as CSSProperties} />)}</div></div>;
 }
