@@ -54,13 +54,9 @@ export default function AdminDashboard({ displayName, initialData }: { displayNa
   async function convertOpportunity(id: number) { const response = await fetch("/api/admin/content-opportunities", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ id, action: "convert" }) }); const payload = await response.json(); if (!response.ok) { alert(payload.error || "Fırsat fikre dönüştürülemedi."); return; } location.href = "/admin/yazilar"; }
 
   return <div className="op8-dashboard">
-    <div className="op8-topbar">
-      <a className="op8-notification" href="/admin/seo" aria-label="Bildirimler">♧<b>3</b></a>
-      <span className="op8-top-avatar">{initials(displayName)}</span>
-    </div>
     <header className="op8-dashboard-head">
-      <div><h1>Merhaba, {displayName} 👋</h1><p>OP8 içeriğinizde bugün neler olduğuna göz atın.</p></div>
-      <div className="op8-health"><span>İçerik Sağlığı ⓘ</span><span className="op8-health-track"><span /></span><strong>91%</strong></div>
+      <div className="op8-welcome"><h1>Merhaba, {displayName} 👋</h1><p>OP8 içeriğinizde bugün neler olduğuna göz atın.</p></div>
+      <div className="op8-head-actions"><div className="op8-health"><span>İçerik Sağlığı ⓘ</span><span className="op8-health-track"><span /></span><strong>91%</strong></div><a className="op8-notification" href="/admin/seo" aria-label="Bildirimler">♧<b>3</b></a><span className="op8-top-avatar">{initials(displayName)}</span></div>
     </header>
     <section className="op8-summary" aria-label="İçerik özeti">
       {summary.map(([label, value, color, icon]) => <div className="op8-summary-item" key={label}>
