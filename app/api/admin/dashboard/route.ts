@@ -37,9 +37,11 @@ export async function GET() {
   return Response.json({
     stats: {
       posts: allPosts.length,
+      idea: countStatus("idea"),
       published: countStatus("published"),
       draft: countStatus("draft"),
       review: countStatus("review"),
+      approved: countStatus("approved"),
       scheduled: countStatus("scheduled"),
       seoIssues,
       categories: Number(categoryCount.value),

@@ -6,7 +6,7 @@ import TextStyleControls, { defaultExcerptStyle, defaultTitleStyle, TextStyle } 
 import AdvancedSeoPanel, { defaultSeoAdvanced, SeoAdvanced } from "./AdvancedSeoPanel";
 
 type Category = { id: number; name: string };
-type Capabilities = { publish: boolean; delete: boolean; ownOnly: boolean };
+type Capabilities = { publish: boolean; delete: boolean; ownOnly: boolean; allowedStatuses: string[]; role: string };
 type Post = { id: number; title: string; slug: string; excerpt: string; content: string; status: string; categoryId: number | null; categoryName?: string | null; coverUrl: string; coverAlt: string; seoTitle: string; seoDescription: string; publishedAt: string | null; updatedAt: string };
 const empty = { title: "", slug: "", excerpt: "", content: "", status: "draft", categoryId: "", coverUrl: "", coverAlt: "", seoTitle: "", seoDescription: "", publishedAt: "" };
 const styleMarker = (title: TextStyle, excerpt: TextStyle, seo: SeoAdvanced) => `<!--op8-style:${JSON.stringify({ title, excerpt, seo })}-->`;
@@ -18,7 +18,8 @@ function readStyles(content: string) {
   catch { return { title: defaultTitleStyle, excerpt: defaultExcerptStyle, seo: defaultSeoAdvanced, content }; }
 }
 
-const statusText = (status: string) => status === "published" ? "Yayında" : status === "scheduled" ? "Planlandı" : status === "review" ? "İncelemede" : "Taslak";
+const statusOptions = [["idea", "Fikir"], ["draft", "Taslak"], ["review", "İncelemede"], ["approved", "Onaylandı"], ["scheduled", "Planlandı"], ["published", "Yayında"]] as const;
+const statusText = (status: string) => statusOptions.find(([value]) => value === status)?.[1] || "Taslak";
 const seoScore = (post: Post) => Math.min(100, 45 + (post.seoTitle ? 15 : 0) + (post.seoDescription ? 15 : 0) + (post.coverAlt ? 10 : 0) + (post.excerpt ? 10 : 0) + (post.slug ? 5 : 0));
 
 export default function PostManagerRich({ preview = false, initialPosts, initialCategories }: { preview?: boolean; initialPosts?: Post[]; initialCategories?: Category[] }) {
@@ -31,7 +32,7 @@ export default function PostManagerRich({ preview = false, initialPosts, initial
     { id: 5, title: "Customer Success Engine: Kapsamlı Rehber", slug: "customer-success-engine", excerpt: "Müşteri başarısı değer motoru.", content: "", status: "published", categoryId: 4, categoryName: "Customer Success", coverUrl: "", coverAlt: "Customer Success", seoTitle: "Customer Success Engine", seoDescription: "Müşteri başarısını ölçeklenebilir bir değer motoruna dönüştürün.", publishedAt: "2026-08-02T10:00:00Z", updatedAt: "2026-08-09T10:00:00Z" },
   ];
   const [posts, setPosts] = useState<Post[]>(preview ? (initialPosts?.length ? initialPosts : previewPosts) : []), [categories, setCategories] = useState<Category[]>(preview ? (initialCategories?.length ? initialCategories : previewCategories) : []);
-  const [capabilities, setCapabilities] = useState<Capabilities>(preview ? { publish: true, delete: true, ownOnly: false } : { publish: false, delete: false, ownOnly: false });
+  const [capabilities, setCapabilities] = useState<Capabilities>(preview ? { publish: true, delete: true, ownOnly: false, allowedStatuses: statusOptions.map(([value]) => value), role: "super_admin" } : { publish: false, delete: false, ownOnly: false, allowedStatuses: ["idea", "draft"], role: "author" });
   const [form, setForm] = useState(empty), [titleStyle, setTitleStyle] = useState<TextStyle>(defaultTitleStyle), [excerptStyle, setExcerptStyle] = useState<TextStyle>(defaultExcerptStyle);
   const [seoAdvanced, setSeoAdvanced] = useState<SeoAdvanced>(defaultSeoAdvanced);
   const [editing, setEditing] = useState<Post | null>(null), [query, setQuery] = useState(""), [statusFilter, setStatusFilter] = useState("all"), [categoryFilter, setCategoryFilter] = useState("all");
@@ -58,7 +59,7 @@ export default function PostManagerRich({ preview = false, initialPosts, initial
   function create() { setEditing(null); setForm(empty); setTitleStyle(defaultTitleStyle); setExcerptStyle(defaultExcerptStyle); setSeoAdvanced(defaultSeoAdvanced); setMessage(""); setDirty(false); setOpen(true); }
   function edit(post: Post) { const styles = readStyles(post.content || ""); setTitleStyle(styles.title); setExcerptStyle(styles.excerpt); setSeoAdvanced(styles.seo); setEditing(post); setForm({ title: post.title, slug: post.slug, excerpt: post.excerpt || "", content: styles.content, status: post.status, categoryId: post.categoryId ? String(post.categoryId) : "", coverUrl: post.coverUrl || "", coverAlt: post.coverAlt || "", seoTitle: post.seoTitle || "", seoDescription: post.seoDescription || "", publishedAt: post.publishedAt ? post.publishedAt.slice(0, 16) : "" }); setDirty(false); setOpen(true); }
   async function save(event: FormEvent) { event.preventDefault(); if (preview) { setDirty(false); setOpen(false); setMessage("Önizleme modunda kayıt simüle edildi."); return; } setSaving(true); try { const response = await fetch("/api/admin/posts", { method: editing ? "PUT" : "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...form, content: styleMarker(titleStyle, excerptStyle, seoAdvanced) + form.content, id: editing?.id, categoryId: form.categoryId ? Number(form.categoryId) : null, publishedAt: form.publishedAt ? new Date(form.publishedAt).toISOString() : null }) }), data = await response.json(); if (!response.ok) { setMessage(data.error || "İçerik kaydedilemedi."); return; } setDirty(false); setOpen(false); setMessage(editing ? "İçerik güncellendi." : "İçerik oluşturuldu."); await load(); } finally { setSaving(false); } }
-  async function status(id: number, value: string) { await fetch("/api/admin/posts", { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ id, status: value }) }); await load(); }
+  async function status(id: number, value: string) { const response = await fetch("/api/admin/posts", { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ id, status: value }) }); const data = await response.json(); if (!response.ok) { setMessage(data.error || "Aşama değiştirilemedi."); return; } setMessage(`İçerik “${statusText(value)}” aşamasına taşındı.`); await load(); }
   async function remove(post: Post) { if (!confirm(`“${post.title}” kalıcı olarak silinsin mi?`)) return; await fetch("/api/admin/posts", { method: "DELETE", headers: { "content-type": "application/json" }, body: JSON.stringify({ id: post.id }) }); await load(); }
 
   const total = Math.max(posts.length, 1);

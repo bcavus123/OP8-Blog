@@ -3,7 +3,7 @@
 import { CSSProperties, useEffect, useState } from "react";
 
 export type DashboardData = {
-  stats: { posts: number; published: number; draft: number; review: number; scheduled: number; seoIssues: number; categories: number; media: number; users: number };
+  stats: { posts: number; idea: number; published: number; draft: number; review: number; approved: number; scheduled: number; seoIssues: number; categories: number; media: number; users: number };
   recent: Array<{ id: number; title: string; status: string; updatedAt: string }>;
   analytics: Array<{ date: string; views: number; visitors: number }>;
 };
@@ -14,7 +14,7 @@ const engines = [
   ["Portfolio", 52, "#f0b400"], ["Customer Success", 46, "#ef3d36"],
 ] as const;
 
-const pipeline = [["Fikir", "18", "#0873ed", "◉"], ["Taslak", "21", "#f0a800", "✎"], ["İnceleme", "8", "#7044c7", "♙"], ["Onaylandı", "4", "#17a49e", "✓"], ["Yayında", "96", "#54a953", "➤"]] as const;
+const pipeline = [["Fikir", "idea", "#0873ed", "◉"], ["Taslak", "draft", "#f0a800", "✎"], ["İnceleme", "review", "#7044c7", "♙"], ["Onaylandı", "approved", "#17a49e", "✓"], ["Yayında", "published", "#54a953", "➤"]] as const;
 
 function statusLabel(status: string) {
   return status === "published" ? "Yayında" : status === "scheduled" ? "Planlandı" : "Taslak";
@@ -28,7 +28,7 @@ export default function AdminDashboard({ displayName, initialData }: { displayNa
   const [data, setData] = useState<DashboardData | null>(initialData ?? null);
   useEffect(() => {
     if (initialData) return;
-    const empty: DashboardData = { stats: { posts: 0, published: 0, draft: 0, review: 0, scheduled: 0, seoIssues: 0, categories: 0, media: 0, users: 0 }, recent: [], analytics: [] };
+    const empty: DashboardData = { stats: { posts: 0, idea: 0, published: 0, draft: 0, review: 0, approved: 0, scheduled: 0, seoIssues: 0, categories: 0, media: 0, users: 0 }, recent: [], analytics: [] };
     fetch("/api/admin/dashboard")
       .then(async (response) => {
         if (!response.ok) throw new Error(`Dashboard verisi alınamadı: ${response.status}`);
@@ -66,7 +66,7 @@ export default function AdminDashboard({ displayName, initialData }: { displayNa
         {(recent.length ? recent : [{ id: 0, title: "Henüz içerik bulunmuyor", status: "draft", updatedAt: "—" }]).slice(0, 5).map((post) => <tr key={post.id}><td><strong>{post.title}</strong><small>{post.id ? `/yazilar/${post.id}` : "Yeni bir içerik oluşturarak başlayın"}</small></td><td>Yazı</td><td><span className={`op8-badge ${post.status}`}>{statusLabel(post.status)}</span></td><td>{post.updatedAt === "—" ? "—" : new Date(post.updatedAt).toLocaleDateString("tr-TR")}</td></tr>)}
       </tbody></table><a className="op8-view-link" href="/admin/yazilar">Tüm içerikleri görüntüle →</a></section>
       <section className="op8-panel"><h2>OP8 Framework Kapsamı</h2><div className="op8-engine-list">{engines.map(([name, score, color]) => <div className="op8-engine-row" key={name} style={{ "--engine": color } as CSSProperties}><span>{name}</span><span className="op8-engine-track"><i style={{ width: `${score}%` }} /></span><span>{score}%</span></div>)}</div></section>
-      <section className="op8-panel"><h2>Editoryal Akış</h2><div className="op8-pipeline">{pipeline.map(([label, value, color, icon]) => <div className="op8-pipeline-step" key={label} style={{ "--step": color } as CSSProperties}><i>{icon}</i><span>{label}</span><strong>{label === "Yayında" ? published : label === "Taslak" ? draft : value}</strong></div>)}</div></section>
+      <section className="op8-panel"><h2>Editoryal Akış</h2><div className="op8-pipeline">{pipeline.map(([label, status, color, icon]) => <div className="op8-pipeline-step" key={label} style={{ "--step": color } as CSSProperties}><i>{icon}</i><span>{label}</span><strong>{data?.stats[status] ?? 0}</strong></div>)}</div></section>
       <section className="op8-panel"><h2>SEO Sağlığı</h2><div className="op8-seo"><div><div className="op8-score">86</div><a className="op8-view-link" href="/admin/seo">SEO raporunu aç →</a></div><div className="op8-issue-list"><span style={{ "--issue": "#ef3b43" } as CSSProperties}>0 Meta sorunu</span><span style={{ "--issue": "#f47521" } as CSSProperties}>0 Kırık bağlantı</span><span style={{ "--issue": "#f0b300" } as CSSProperties}>0 Sahipsiz sayfa</span><span style={{ "--issue": "#0873ed" } as CSSProperties}>0 Eksik alt metin</span></div></div></section>
       <section className="op8-panel"><h2>İçerik Fırsatları</h2><div className="op8-opportunities"><div className="op8-opportunity"><span>♡</span><div><strong>Customer Success kapsamını artırın</strong><small>Bu değer motorunda yeni içerik fırsatları var.</small></div></div><div className="op8-opportunity"><span>◔</span><div><strong>Portfolio içerik planı</strong><small>Framework kapsamını yeni yazılarla genişletin.</small></div></div><div className="op8-opportunity"><span>▤</span><div><strong>100 Günlük Plan serisi</strong><small>Operating Partner metodolojisini derinleştirin.</small></div></div></div><a className="op8-view-link" href="/admin/yazilar">İçerik planına git →</a></section>
       <section className="op8-panel"><h2>Son Hareketler</h2><div className="op8-activity">{(data?.recent ?? []).slice(0, 4).map((post, index) => <div className="op8-activity-row" key={post.id}><span>{index === 0 ? "Bugün" : `${index + 1} gün`}</span><strong>“{post.title}” güncellendi</strong></div>)}{!data?.recent.length && <div className="op8-activity-row"><span>—</span><strong>Henüz hareket bulunmuyor.</strong></div>}</div><a className="op8-view-link" href="/admin/yazilar">Tüm hareketler →</a></section>
